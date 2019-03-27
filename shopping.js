@@ -36,7 +36,7 @@ function catchPromptSelect(prompt) {
   }
 }
 
-function createOmniFocusCallback(content, project, tags) {
+function OFCallback(content, project, tags) {
   let cbContent = content;
   const cb = CallbackURL.create();
   const target = `/task/${encodeURI(project)}`;
@@ -69,16 +69,10 @@ const storesPrompt = Prompt.create();
 storesPrompt.addSelect('stores', 'Choose Stores:', MY_STORES, [], true);
 storesPrompt.addButton('Submit');
 catchPromptSelect(storesPrompt);
-console.log(storesPrompt);
-
 const selectedStores = storesPrompt.fieldValues.stores;
-console.log(selectedStores);
-
 if (selectedStores.length > 0) {
   tags = tags.concat(selectedStores);
 }
 
-console.log(tags);
-
-const cb = createOmniFocusCallback(content, 'Shopping', tags);
+const cb = OFCallback(content, 'Shopping', tags);
 handleCallbackOpen(cb);
