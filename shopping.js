@@ -1,74 +1,78 @@
-// See online documentation for examples
-// http://getdrafts.com/scripting
+/* global CallbackURL, cancel, context, editor, Prompt */
 
-const draftsContent = editor.getText();
-let content = draftsContent;
+const MY_STORES = [
+  'amazon',
+  'cousins',
+  'fine fare',
+  'hardware',
+  'liberty choice',
+  'pharmacy',
+  'spring garden market',
+  'whole foods',
+];
 
-const p = Prompt.create();
-p.addButton("Investigate Music");
-p.addButton("Groceries");
-p.addButton("General Shopping");
+/**
+ * Adds the Draft as TaskPaper content to OmniFocus
+ */
 
-const didSelect = p.show();
-if (didSelect === false) {
-	cancel("User cancelled the script");
+function handleCallbackOpen(cb) {
+  const success = cb.open();
+  if (success) {
+    console.log('Taskpaper added to OF');
+  } else {
+    console.log(cb.status);
+    if (cb.status == 'cancel') {
+      context.cancel();
+    } else {
+      context.fail();
+    }
+  }
 }
 
-const baseURL = "omnifocus:///paste";
+function catchPromptSelection(prompt) {
+  const didSelect = prompt.show();
+  if (didSelect === false) {
+    cancel('User cancelled the script');
+  }
+}
 
-let projectName = "";
+function createOmniFocusCallback(content, project, tags) {
+  let cbContent = content;
+  const cb = CallbackURL.create();
+  const target = `/task/${encodeURI(project)}`;
+
+  if (tags.length > 0) {
+    cbContent += ` @tags(${tags.toString()})`;
+  }
+
+  cb.baseURL = 'omnifocus:///paste';
+  cb.addParameter('target', target);
+  cb.addParameter('content', cbContent);
+
+  return cb;
+}
+
+const content = editor.getText();
 let tags = [];
-switch (p.buttonPressed) {
-	case "Investigate Music":
-		projectName = "Investigate : Music Collection";
-		break;
-	case "Groceries":
-		projectName = "Shopping";
-		tags.push("groceries");
-		break;
-		
-	case "General Shopping":
-		projectName = "Shopping";
-		break;
+
+const prompt = Prompt.create();
+prompt.addButton('Groceries');
+prompt.addButton('General Shopping');
+
+catchPromptSelection(prompt);
+
+if (prompt.buttonPressed === 'Groceries') {
+  tags.push('groceries');
 }
 
-const target = "/task/" + encodeURI(projectName);
-
-		const stores = [
-			"whole foods",
-			"fine fare",
-			"cousins",
-			"liberty choice",
-			"spring garden market",
-		];
-		const storesPrompt = Prompt.create();
-		storesPrompt.addSelect("store", "Choose store", [stores], [0]);
-		const didSelect = storesPrompt.show();
-		if (didSelect === false) {
-			cancel("User cancelled the script");
-		}
-		const selectedStores = storesPrompt.fieldValues;
-		console.log(selectedStores);
-
-if (tags.length > 0) {
- 	content += ` @tags(${tags.toString()})`;
+// Prompt the user to select stores and add the stores to tags
+const storesPrompt = Prompt.create();
+storesPrompt.addSelect('store', 'Choose stores', MY_STORES, [], true);
+catchPromptSelection(storesPrompt);
+const selectedStores = storesPrompt.fieldValues;
+if (selectedStores.length > 0) {
+  tags = tags.concat(selectedStores);
 }
 
-// send this to OmniFocus
-const cb = CallbackURL.create();
-cb.baseURL = baseURL;
-cb.addParameter("target", target);
-cb.addParameter("content", content);
-
-// open and wait for result
-const success = cb.open();
-if (success) {
-	console.log("Taskpaper added to OF");
-} else {
-  	console.log(cb.status);
-  	if (cb.status == "cancel") {
-		context.cancel();
-	} else {
-		context.fail();
-	}
-}
+const cb = createOmniFocusCallback(content, 'Shopping', tags);
+handleCallbackOpen(cb);
