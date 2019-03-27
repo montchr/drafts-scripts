@@ -66,12 +66,12 @@ if (prompt.buttonPressed === 'Groceries') {
 
 // Prompt the user to select stores and add the stores to tags
 const storesPrompt = Prompt.create();
-storesPrompt.addSelect('store', 'Choose Stores:', MY_STORES, [], true);
+storesPrompt.addSelect('stores', 'Choose Stores:', MY_STORES, [], true);
 storesPrompt.addButton('Submit');
 catchPromptSelect(storesPrompt);
 console.log(storesPrompt);
 
-const selectedStores = storesPrompt.fieldValues;
+const selectedStores = storesPrompt.fieldValues.stores;
 console.log(selectedStores);
 
 if (selectedStores.length > 0) {
