@@ -29,11 +29,12 @@ function handleCallbackOpen(cb) {
   }
 }
 
-function catchPromptSelection(prompt) {
+function handlePrompt(prompt) {
   const didSelect = prompt.show();
   if (didSelect === false) {
     cancel('User cancelled the script');
   }
+  return didSelect;
 }
 
 function createOmniFocusCallback(content, project, tags) {
@@ -55,25 +56,28 @@ function createOmniFocusCallback(content, project, tags) {
 const content = editor.getText();
 let tags = [];
 
-const prompt = Prompt.create();
+let prompt = Prompt.create();
 prompt.addButton('Groceries');
 prompt.addButton('General Shopping');
-
-catchPromptSelection(prompt);
+prompt = handlePrompt(prompt);
 
 if (prompt.buttonPressed === 'Groceries') {
   tags.push('groceries');
 }
 
 // Prompt the user to select stores and add the stores to tags
-const storesPrompt = Prompt.create();
+let storesPrompt = Prompt.create();
 storesPrompt.addSelect('store', 'Choose Stores:', MY_STORES, [], true);
 storesPrompt.addButton('Submit');
-catchPromptSelection(storesPrompt);
+storesPrompt = handlePrompt(storesPrompt);
 const selectedStores = storesPrompt.fieldValues;
+console.log(selectedStores);
+
 if (selectedStores.length > 0) {
   tags = tags.concat(selectedStores);
 }
+
+console.log(tags);
 
 const cb = createOmniFocusCallback(content, 'Shopping', tags);
 handleCallbackOpen(cb);
