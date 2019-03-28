@@ -9,4 +9,5 @@
 
 const lines = draft.content.split('\n');
 const pattern = /^\s+\*\s/;
-draft.content = lines.map(line => line.replace(pattern, ''));
+const cleanLines = lines.map(line => line.replace(pattern, ''));
+draft.content = cleanLines.join('\n');
