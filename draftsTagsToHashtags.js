@@ -20,7 +20,7 @@ if (newTags.length > 0) {
   const newHashtags = newTags.map(tag => `#${tag}`);
   console.log(newHashtags);
 
-  draft.content += newHashtags.join(' ');
+  draft.content += `\n\n${newHashtags.join(' ')}`;
 }
 
 console.log(draft.content);
