@@ -2,7 +2,21 @@
 /* eslint-disable no-console, no-unused-vars */
 
 function SendToOmniFocus(content, options = {}) {
-  let cbContent;
+  const lines = content.split('\n');
+
+  function doCallback(cb, successMessage) {
+    const success = cb.open();
+    if (success) {
+      if (successMessage) console.log(successMessage);
+    } else {
+      console.log(cb.status);
+      if (cb.status === 'cancel') {
+        context.cancel();
+      } else {
+        context.fail();
+      }
+    }
+  }
 
   const defaults = {
     project: '',
@@ -15,37 +29,30 @@ function SendToOmniFocus(content, options = {}) {
     project, tags, successMessage, edit,
   } = actualOptions;
 
-  const cb = CallbackURL.create();
-  const lines = content.split('\n');
-
-  lines.forEach((line) => {
-    // Convert to TaskPaper format
-    cbContent = `- ${line}`;
-
-    if (tags.length > 0) {
-      cbContent += ` @tags(${tags.toString()})`;
-    }
-
-    if (edit) {
+  if (edit) {
+    lines.forEach((task) => {
+      const cb = CallbackURL.create();
       cb.baseURL = 'omnifocus:///add';
-      cb.addParameter('name', cbContent);
-    } else {
-      const target = `/task/${encodeURI(project)}`;
-      cb.baseURL = 'omnifocus:///paste';
-      cb.addParameter('target', target);
-      cb.addParameter('content', cbContent);
-    }
+      cb.addParameter('name', task);
+      doCallback(cb, successMessage);
+    });
+  } else {
+    const cb = CallbackURL.create();
+    const target = `/task/${encodeURI(project)}`;
 
-    const success = cb.open();
-    if (success) {
-      if (successMessage) console.log(successMessage);
-    } else {
-      console.log(cb.status);
-      if (cb.status === 'cancel') {
-        context.cancel();
-      } else {
-        context.fail();
+    const taskpaperLines = lines.map((line) => {
+      let lineContent = line;
+      lineContent = `- ${line}`;
+      if (tags.length > 0) {
+        lineContent += ` @tags(${tags.toString()})`;
       }
-    }
-  });
+      return lineContent;
+    });
+    const taskpaper = taskpaperLines.join('\n');
+
+    cb.baseURL = 'omnifocus:///paste';
+    cb.addParameter('target', target);
+    cb.addParameter('content', taskpaper);
+    doCallback(cb, successMessage);
+  }
 }
