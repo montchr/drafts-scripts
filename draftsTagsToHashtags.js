@@ -1,26 +1,35 @@
 /* global draft */
 
+/**
+ * Tags to Hashtags
+ *
+ * Converts Drafts tags to hashtags and appends them to the content if the
+ * hashtags aren’t already present.
+ *
+ * Has the same single-word hashtag limitation as similar scripts. Any Drafts
+ * tags containing spaces will be converted to a hashtag with no spaces. Why
+ * would you want a hashtag with spaces anyway?
+ *
+ * Basically does the opposite of @derekvan's "Tag drafts by hashtag" <http://actions.getdrafts.com/a/1Q7>
+ *
+ * Based on @kjaymiller's "Add Hashtags from Inside of Draft" action <http://actions.getdrafts.com/a/1ME>
+ *
+ * @author Chris Montgomery <chris@montchr.io>
+ */
+
 const { content, tags } = draft;
 const spacelessTags = tags.map(tag => tag.replace(' ', ''));
-console.log(spacelessTags);
 
 const re = /#[\w\d]+/g;
 const hashtags = content.match(re);
-console.log(hashtags);
 
 const hashlessHashtags = hashtags.map(tag => tag.replace('#', ''));
-console.log(hashlessHashtags);
 
 // Get the draft tags that don't already have hashtag equivalents in the content
 // and append them to the current draft's content
 const newTags = spacelessTags.filter(tag => !hashlessHashtags.includes(tag));
-console.log(newTags);
 
 if (newTags.length > 0) {
   const newHashtags = newTags.map(tag => `#${tag}`);
-  console.log(newHashtags);
-
   draft.content += `\n\n${newHashtags.join(' ')}`;
 }
-
-console.log(draft.content);
