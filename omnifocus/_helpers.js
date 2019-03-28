@@ -1,12 +1,5 @@
-/* global CallbackURL, cancel, context */
+/* global CallbackURL, context */
 /* eslint-disable no-console, no-unused-vars */
-
-function catchPromptSelect(prompt) {
-  const didSelect = prompt.show();
-  if (didSelect === false) {
-    cancel('User cancelled the script');
-  }
-}
 
 function SendToOmniFocus(content, options = {}) {
   let cbContent;
@@ -23,7 +16,6 @@ function SendToOmniFocus(content, options = {}) {
   } = actualOptions;
 
   const cb = CallbackURL.create();
-
   const lines = content.split('\n');
 
   lines.forEach((line) => {
@@ -49,7 +41,7 @@ function SendToOmniFocus(content, options = {}) {
       if (successMessage) console.log(successMessage);
     } else {
       console.log(cb.status);
-      if (cb.status == 'cancel') {
+      if (cb.status === 'cancel') {
         context.cancel();
       } else {
         context.fail();

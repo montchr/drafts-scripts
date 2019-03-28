@@ -1,4 +1,4 @@
-/* global catchPromptSelect, editor, SendToOmniFocus, Prompt */
+/* global cancel, editor, SendToOmniFocus, Prompt */
 
 const MY_STORES = [
   'amazon',
@@ -18,7 +18,11 @@ const prompt = Prompt.create();
 prompt.addButton('Groceries');
 prompt.addButton('General Shopping');
 prompt.addSwitch('edit', 'Edit in OmniFocus?', false);
-catchPromptSelect(prompt);
+const promptSubmitted = prompt.show();
+if (promptSubmitted === false) {
+  cancel('User cancelled the script');
+}
+
 // Edit the task before adding to OmniFocus?
 const { edit } = prompt.fieldValues;
 
@@ -30,7 +34,10 @@ if (prompt.buttonPressed === 'Groceries') {
 const storesPrompt = Prompt.create();
 storesPrompt.addSelect('stores', 'Choose Stores:', MY_STORES, [], true);
 storesPrompt.addButton('Submit');
-catchPromptSelect(storesPrompt);
+const storesPromptSubmitted = storesPrompt.show();
+if (storesPromptSubmitted === false) {
+  cancel('User cancelled the script');
+}
 const selectedStores = storesPrompt.fieldValues.stores;
 if (selectedStores.length > 0) {
   tags = tags.concat(selectedStores);

@@ -1,4 +1,4 @@
-/* global catchPromptSelect, editor, SendToOmniFocus, Prompt */
+/* global cancel, editor, SendToOmniFocus, Prompt */
 
 /**
  * Adds the Draft as TaskPaper content to OmniFocus
@@ -13,7 +13,10 @@ prompt.addButton('General');
 prompt.addButton('Reading');
 prompt.addButton('Restaurants');
 prompt.addSwitch('edit', 'Edit in OmniFocus?', false);
-catchPromptSelect(prompt);
+const promptSubmitted = prompt.show();
+if (promptSubmitted === false) {
+  cancel('User cancelled the script');
+}
 const { buttonPressed } = prompt;
 // Edit the task before adding to OmniFocus?
 const { edit } = prompt.fieldValues;
