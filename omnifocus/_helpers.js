@@ -35,7 +35,7 @@ function SendToOmniFocus(content, options = {}) {
       cb.baseURL = 'omnifocus:///add';
       cb.addParameter('name', task);
       cb.addParameter('project', project);
-      tags.forEach(tag => cb.addParameter('tag', tag));
+      cb.addParameter('tags', tags);
       doCallback(cb, successMessage);
     });
   } else {
