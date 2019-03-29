@@ -34,7 +34,7 @@
  */
 
 const lines = draft.content.split('\n');
-draft.content = lines.map((line, i) => {
+const newContent = lines.map((line, i) => {
   // Leave the Title and blank lines untouched
   if (i === 0 || line === '') return line;
   // Prepare the Attribution
@@ -44,3 +44,4 @@ draft.content = lines.map((line, i) => {
   // All others should be blockquotes
   return `> ${line}`;
 });
+draft.content = newContent.join('\n');
