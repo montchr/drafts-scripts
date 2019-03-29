@@ -1,4 +1,4 @@
-/* global cancel, draft */
+/* global context, draft */
 
 /**
  * Tags to Hashtags
@@ -21,7 +21,7 @@
 const { content, tags } = draft;
 
 if (!tags || tags.length === 0) {
-  cancel('No tags found!');
+  context.cancel('No tags found!');
 }
 
 const spacelessTags = tags.map(tag => tag.replace(' ', ''));
