@@ -25,11 +25,11 @@ if (!tags || tags.length === 0) {
 }
 
 const spacelessTags = tags.map(tag => tag.replace(' ', ''));
+let newTags = spacelessTags;
 
 const re = /#[\w\d]+/g;
 const hashtags = content.match(re);
 
-let newTags = tags;
 // Get the draft tags that don't already have hashtag equivalents in the content
 if (hashtags) {
   const hashlessHashtags = hashtags.map(tag => tag.replace('#', ''));
