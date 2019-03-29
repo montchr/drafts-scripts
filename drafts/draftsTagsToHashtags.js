@@ -1,4 +1,4 @@
-/* global draft */
+/* global cancel, draft */
 
 /**
  * Tags to Hashtags
@@ -15,20 +15,28 @@
  * Based on @kjaymiller's "Add Hashtags from Inside of Draft" action <http://actions.getdrafts.com/a/1ME>
  *
  * @author Chris Montgomery <chris@montchr.io>
+ * @link https://actions.getdrafts.com/a/1Uu
  */
 
 const { content, tags } = draft;
+
+if (!tags || tags.length === 0) {
+  cancel('No tags found!');
+}
+
 const spacelessTags = tags.map(tag => tag.replace(' ', ''));
 
 const re = /#[\w\d]+/g;
 const hashtags = content.match(re);
 
-const hashlessHashtags = hashtags.map(tag => tag.replace('#', ''));
-
+let newTags = tags;
 // Get the draft tags that don't already have hashtag equivalents in the content
-// and append them to the current draft's content
-const newTags = spacelessTags.filter(tag => !hashlessHashtags.includes(tag));
+if (hashtags) {
+  const hashlessHashtags = hashtags.map(tag => tag.replace('#', ''));
+  newTags = spacelessTags.filter(tag => !hashlessHashtags.includes(tag));
+}
 
+// Append the new tags to the content
 if (newTags.length > 0) {
   const newHashtags = newTags.map(tag => `#${tag}`);
   draft.content += `\n\n${newHashtags.join(' ')}`;
