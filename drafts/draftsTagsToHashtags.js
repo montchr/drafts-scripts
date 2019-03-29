@@ -20,7 +20,7 @@
 
 const { content, tags } = draft;
 
-if (tags.length === 0) {
+if (!tags || tags.length === 0) {
   cancel('No tags found!');
 }
 
@@ -31,7 +31,7 @@ const hashtags = content.match(re);
 
 let newTags = tags;
 // Get the draft tags that don't already have hashtag equivalents in the content
-if (hashtags.length > 0) {
+if (hashtags) {
   const hashlessHashtags = hashtags.map(tag => tag.replace('#', ''));
   newTags = spacelessTags.filter(tag => !hashlessHashtags.includes(tag));
 }
