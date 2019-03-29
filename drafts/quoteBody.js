@@ -34,14 +34,29 @@
  */
 
 const lines = draft.content.split('\n');
+const lastLine = lines[lines.length - 1];
+const secondToLastLine = lines[lines.length - 2];
+
+// Find an attribution line and save it as the `attribution` template tag
+let attributionLine = '';
+const isAttribution = line => line.slice(0, 2) === '- ';
+if (isAttribution(lastLine) && secondToLastLine === '') {
+  attributionLine = lastLine;
+} else if (lastLine === '' && isAttribution(secondToLastLine) && lines[lines.length - 3] === '') {
+  attributionLine = secondToLastLine;
+}
+const attribution = attributionLine.replace(/^(- )/, '');
+draft.setTemplateTag('attribution', attribution);
+
 const newContent = lines.map((line, i) => {
   // Leave the Title and blank lines untouched
   if (i === 0 || line === '') return line;
   // Prepare the Attribution
-  if (i === lines.length - 1 && line.slice(0, 2) === '- ' && lines[i - 1] === '') {
-    return `— ${line}`;
+  if (line === attributionLine) {
+    return `— ${attribution}`;
   }
   // All others should be blockquotes
   return `> ${line}`;
 });
+
 draft.content = newContent.join('\n');
