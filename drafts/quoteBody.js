@@ -11,6 +11,9 @@
  * the remainder of the line after the double dash will be stored in the
  * `attribution` template tag.
  *
+ * If there's no attribution, additional unquoted content can be added after a
+ * divider line / horizontal rule like `---`.
+ *
  * By default this script will add the blockquote character (`>`) to the
  * beginning of blank lines, but you can set the `QUOTE_BLANK_LINES` variable to
  * `false` to disable this.
@@ -54,22 +57,26 @@ const QUOTE_BLANK_LINES = true;
 
 const lines = draft.content.split('\n');
 
+const ruleLineIndex = lines.findIndex(line => line.slice(0, 3) === '---');
+
 // Find a line beginning with `--` and interpret it as the attribution
 const attributionLineIndex = lines.findIndex(line => line.slice(0, 2) === '--');
 const attributionLine = attributionLineIndex !== -1 ? lines[attributionLineIndex] : '';
-console.log(attributionLine);
-
 const attribution = attributionLine.replace(/^(--)/, '').replace(/^\s/, '');
 draft.setTemplateTag('attribution', attribution);
 
+// If present, either the attribution or horizontal rule line (in that order of
+// precedence) will act as the divider between quoted content and unquoted
+// content. Without either of these lines, all the content will be quoted.
+const unquoteDividerIndex = attribution ? attributionLineIndex : ruleLineIndex;
+
 const newContent = lines.map((line, i) => {
   if (i === attributionLineIndex) return `— ${attribution}`;
-  if (attributionLine && i > attributionLineIndex) return line;
+  // If the line before the unquote divider is blank it should not be quoted
+  if (i === unquoteDividerIndex - 1 && line === '') return line;
+  // Everything after the unquote divider should not be quoted
+  if (unquoteDividerIndex !== -1 && i > unquoteDividerIndex) return line;
   if (line === '') {
-    // The line above the attribution should always be blank
-    if (i === attributionLineIndex - 1) {
-      return line;
-    }
     return QUOTE_BLANK_LINES ? '>' : '';
   }
   return `> ${line}`;
