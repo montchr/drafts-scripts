@@ -1,4 +1,4 @@
-/* global context, draft */
+/* global draft */
 
 /**
  * Tags to Hashtags
@@ -20,24 +20,22 @@
 
 const { content, tags } = draft;
 
-if (!tags || tags.length === 0) {
-  context.cancel('No tags found!');
-}
+if (tags && tags.length === 0) {
+  const spacelessTags = tags.map(tag => tag.replace(' ', ''));
+  let newTags = spacelessTags;
 
-const spacelessTags = tags.map(tag => tag.replace(' ', ''));
-let newTags = spacelessTags;
+  const re = /#[\w\d]+/g;
+  const hashtags = content.match(re);
 
-const re = /#[\w\d]+/g;
-const hashtags = content.match(re);
+  // Get the draft tags that don't already have hashtag equivalents in the content
+  if (hashtags) {
+    const hashlessHashtags = hashtags.map(tag => tag.replace('#', ''));
+    newTags = spacelessTags.filter(tag => !hashlessHashtags.includes(tag));
+  }
 
-// Get the draft tags that don't already have hashtag equivalents in the content
-if (hashtags) {
-  const hashlessHashtags = hashtags.map(tag => tag.replace('#', ''));
-  newTags = spacelessTags.filter(tag => !hashlessHashtags.includes(tag));
-}
-
-// Append the new tags to the content
-if (newTags.length > 0) {
-  const newHashtags = newTags.map(tag => `#${tag}`);
-  draft.content += `\n\n${newHashtags.join(' ')}`;
+  // Append the new tags to the content
+  if (newTags.length > 0) {
+    const newHashtags = newTags.map(tag => `#${tag}`);
+    draft.content += `\n\n${newHashtags.join(' ')}`;
+  }
 }
