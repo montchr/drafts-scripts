@@ -6,18 +6,14 @@
  * A title line is not supported, because in most cases you'll probably just
  * want to enter a quote and be done with it.
  *
- * The first line from the bottom of the file beginning with a dash and a space
- * (`- `) will be interpretated as an attribution line. The dash will be
- * replaced with an em dash, and the remainder of the line after the dash+space
- * will be stored in the `attribution` template tag.
- *
- * Lines beginning with `- ` are okay in the quote body (above the attribution
- * line), but lines beginning with `- ` below the desired attribution line are
- * not allowed because they'll be interpreted as the attribution instead.
+ * The first line beginning with a double dash (`--`) will be interpretated as
+ * an attribution line. The double dash will be replaced with an em dash, and
+ * the remainder of the line after the double dash will be stored in the
+ * `attribution` template tag.
  *
  * With a draft content like this:
  *
- * ```
+ * ```md
  * Here's some text to be interpreted as a quote.
  *
  * There can be multiple lines.
@@ -25,7 +21,7 @@
  * - There can be
  * - Lists
  *
- * - Attribution
+ * -- Attribution
  *
  * You might also have other commentary or information about the source here.
  * ```
@@ -50,16 +46,12 @@
 
 const lines = draft.content.split('\n');
 
-// Find an attribution line and save it as the `attribution` template tag
-// Note that this will iterate through the lines in reverse -- see note in the
-// file comment above.
-const attributionLineIndex = lines
-  .reverse()
-  .findIndex((line, i) => lines[i - 1] === '' && line.slice(0, 2) === '- ');
+// Find a line beginning with `--` and interpret it as the attribution
+const attributionLineIndex = lines.findIndex(line => line.slice(0, 2) === '--');
 const attributionLine = attributionLineIndex !== -1 ? lines[attributionLineIndex] : '';
 console.log(attributionLine);
 
-const attribution = attributionLine.replace(/^(- )/, '');
+const attribution = attributionLine.replace(/^(--)/, '').replace(/^\s/, '');
 draft.setTemplateTag('attribution', attribution);
 
 const newContent = lines.map((line, i) => {
