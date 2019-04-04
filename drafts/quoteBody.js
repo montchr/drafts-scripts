@@ -60,7 +60,9 @@ const lines = draft.content.split('\n');
 const ruleLineIndex = lines.findIndex(line => line.slice(0, 3) === '---');
 
 // Find a line beginning with `--` and interpret it as the attribution
-const attributionLineIndex = lines.findIndex(line => line.slice(0, 2) === '--');
+const attributionLineIndex = lines.findIndex(
+  (line, i) => i !== ruleLineIndex && line.slice(0, 2) === '--',
+);
 const attributionLine = attributionLineIndex !== -1 ? lines[attributionLineIndex] : '';
 const attribution = attributionLine.replace(/^(--)/, '').replace(/^\s/, '');
 draft.setTemplateTag('attribution', attribution);
