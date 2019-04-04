@@ -74,6 +74,7 @@ const unquoteDividerIndex = attribution ? attributionLineIndex : ruleLineIndex;
 
 const newContent = lines.map((line, i) => {
   if (i === attributionLineIndex) return `— ${attribution}`;
+  if (i === ruleLineIndex) return line;
   // If the line before the unquote divider is blank it should not be quoted
   if (i === unquoteDividerIndex - 1 && line === '') return line;
   // Everything after the unquote divider should not be quoted
