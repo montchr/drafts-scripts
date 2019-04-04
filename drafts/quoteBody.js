@@ -11,6 +11,10 @@
  * the remainder of the line after the double dash will be stored in the
  * `attribution` template tag.
  *
+ * By default this script will add the blockquote character (`>`) to the
+ * beginning of blank lines, but you can set the `QUOTE_BLANK_LINES` variable to
+ * `false` to disable this.
+ *
  * With a draft content like this:
  *
  * ```md
@@ -30,9 +34,9 @@
  *
  * ```md
  * > Here's some text to be interpreted as a quote.
- *
+ * >
  * > There can be multiple lines.
- *
+ * >
  * > - There can be
  * > - Lists
  *
@@ -43,6 +47,10 @@
  *
  * @author Chris Montgomery <chris@montchr.io>
  */
+
+// Begin customizable settings
+const QUOTE_BLANK_LINES = true;
+// End customizable settings
 
 const lines = draft.content.split('\n');
 
@@ -55,13 +63,15 @@ const attribution = attributionLine.replace(/^(--)/, '').replace(/^\s/, '');
 draft.setTemplateTag('attribution', attribution);
 
 const newContent = lines.map((line, i) => {
-  // Leave blank lines untouched
-  if (line === '') return line;
-  // Prepare the attribution
   if (i === attributionLineIndex) return `— ${attribution}`;
-  // Leave lines after the attribution untouched
-  if (i > attributionLineIndex) return line;
-  // All others should be blockquotes
+  if (attributionLine && i > attributionLineIndex) return line;
+  if (line === '') {
+    // The line above the attribution should always be blank
+    if (i === attributionLineIndex - 1) {
+      return line;
+    }
+    return QUOTE_BLANK_LINES ? '>' : '';
+  }
   return `> ${line}`;
 });
 
