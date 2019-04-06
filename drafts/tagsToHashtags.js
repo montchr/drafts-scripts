@@ -20,7 +20,7 @@
 
 const { content, tags } = draft;
 
-if (tags && tags.length === 0) {
+if (tags && tags.length !== 0) {
   const spacelessTags = tags.map(tag => tag.replace(' ', ''));
   let newTags = spacelessTags;
 
